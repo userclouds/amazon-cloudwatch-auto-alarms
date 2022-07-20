@@ -44,18 +44,26 @@ def check_alarm_tag(instance_id, tag_key):
                 {
                     'Name': 'tag-key',
                     'Values': [
-                        tag_key
+                        'elasticbeanstalk:environment-name'
                     ]
                 }
             ],
             InstanceIds=[
                 instance_id
             ]
-
         )
+
         # can only be one instance when called by CloudWatch Events
         if 'Reservations' in instance and len(instance['Reservations']) > 0 and len(
                 instance['Reservations'][0]['Instances']) > 0:
+
+            # we aren't use alarm tags here, we only want prod env
+            instance = instance['Reservations'][0]['Instances'][0]
+            for tag in instance['Tags']:
+                if tag['Key'] == 'elasticbeanstalk:environment-name' and \
+                    tag['Value'] != 'userclouds-prod':
+                    return False
+
             ec2_client.create_tags(
                 Resources=[
                     instance_id
@@ -67,7 +75,7 @@ def check_alarm_tag(instance_id, tag_key):
                     }
                 ]
             )
-            return instance['Reservations'][0]['Instances'][0]
+            return instance
         else:
             return False
 
