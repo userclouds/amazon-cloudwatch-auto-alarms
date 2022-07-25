@@ -36,11 +36,6 @@ default_alarms = {
             'Key': alarm_separator.join(
                 [alarm_identifier, 'AWS/EC2', 'CPUUtilization', 'GreaterThanThreshold', '5m', 'Average']),
             'Value': alarm_cpu_high_default_threshold
-        },
-        {
-            'Key': alarm_separator.join(
-                [alarm_identifier, 'AWS/EC2', 'CPUCreditBalance', 'LessThanThreshold', '5m', 'Average']),
-            'Value': alarm_credit_balance_low_default_threshold
         }
     ],
     'AWS/Lambda': [
