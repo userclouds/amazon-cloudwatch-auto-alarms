@@ -226,6 +226,7 @@ def determine_platform(imageid):
 
         )
 
+        img_info = image_info['Images'][0]
         # can only be one instance when called by CloudWatch Events
         if 'Images' in image_info and len(image_info['Images']) > 0:
             platform_details = image_info['Images'][0]['PlatformDetails']
@@ -237,8 +238,8 @@ def determine_platform(imageid):
             elif 'SUSE' in platform_details:
                 return 'SUSE'
             elif 'Linux/UNIX' in platform_details:
-                if 'ubuntu' in image_info['Images'][0]['Description'].lower() or 'ubuntu' in image_info['Images'][0][
-                    'Name'].lower():
+                if ('Description' in img_info and 'ubuntu' in img_info['Description'].lower()) or \
+                    ('Name' in img_info and 'ubuntu' in img_info['Name'].lower()):
                     return 'Ubuntu'
                 else:
                     return 'Amazon Linux'
