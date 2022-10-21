@@ -10,7 +10,7 @@ cw_namespace = getenv("CLOUDWATCH_NAMESPACE", "CWAgent")
 
 create_default_alarms_flag = getenv("CREATE_DEFAULT_ALARMS", "true").lower()
 
-append_dimensions = getenv("CLOUDWATCH_APPEND_DIMENSIONS", 'InstanceId, ImageId, InstanceType')
+append_dimensions = getenv("CLOUDWATCH_APPEND_DIMENSIONS", 'InstanceId, AutoScalingGroupName')
 append_dimensions = [dimension.strip() for dimension in append_dimensions.split(',')]
 
 alarm_cpu_high_default_threshold = getenv("ALARM_CPU_HIGH_THRESHOLD", "75")
