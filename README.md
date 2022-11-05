@@ -2,6 +2,10 @@
 
 based on this blog post: https://aws.amazon.com/blogs/mt/use-tags-to-create-and-maintain-amazon-cloudwatch-alarms-for-amazon-ec2-instances-part-1/#:~:text=By%20adding%20the%20tag%20key,Proceed%20without%20a%20key%20pair.
 
+Note that changing configuration (eg. `CloudWatchAutoAlarms.yaml`, which controls things like which
+tags are applied to alarm metrics), seems to require actually editing the lambda Configuration UI after
+the first time it's deployed (I haven't debugged if this is expected or why, just observed it's the case).
+
 ![CloudWatchAutoAlarms Architecture Diagram](./CloudWatchAutoAlarmsArchitecture.png)
 
 The CloudWatchAutoAlarms AWS Lambda function enables you to quickly and automatically create a standard set of CloudWatch alarms for your Amazon EC2 instances or AWS Lambda functions using tags.  It prevents errors that may occur by manually creating alarms, reduces the time required to deploy alarms, and reduces the skills gap required in order to create and manage alarms.  It can be especially useful during a large migration to AWS where many resources may be migrated into your AWS account at once.
