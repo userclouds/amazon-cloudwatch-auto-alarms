@@ -61,8 +61,8 @@ def check_alarm_tag(instance_id, tag_key):
             instance = instance['Reservations'][0]['Instances'][0]
             for tag in instance['Tags']:
                 if tag['Key'] == 'elasticbeanstalk:environment-name' and \
-                    tag['Value'] != 'userclouds-prod' and \
-                    tag['Value'] != 'userclouds-staging':
+                    'userclouds-prod' not in tag['Value'] and \
+                    'userclouds-staging' not in tag['Value']:
                     return False
 
             ec2_client.create_tags(
