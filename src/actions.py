@@ -57,11 +57,12 @@ def check_alarm_tag(instance_id, tag_key):
         if 'Reservations' in instance and len(instance['Reservations']) > 0 and len(
                 instance['Reservations'][0]['Instances']) > 0:
 
-            # we aren't use alarm tags here, we only want prod env
+            # we aren't using alarm tags here, we only want prod env
             instance = instance['Reservations'][0]['Instances'][0]
             for tag in instance['Tags']:
                 if tag['Key'] == 'elasticbeanstalk:environment-name' and \
-                    tag['Value'] != 'userclouds-prod':
+                    'userclouds-prod' not in tag['Value'] and \
+                    'userclouds-staging' not in tag['Value']:
                     return False
 
             ec2_client.create_tags(
