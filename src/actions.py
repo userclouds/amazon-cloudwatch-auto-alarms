@@ -191,6 +191,45 @@ def create_alarm_from_tag(id, alarm_tag, instance_info, metric_dimensions_map, s
                  dimensions, sns_topic_arn)
 
 
+def update_alarms_for_instance(instance_id, tagset):
+    asg_name = None
+    for tag in tagset:
+        if tag.key == "aws:autoscaling:groupName":
+            asg_name = tag.value
+            logger.info("Found autoscaling group name: {}".format(asg_name))
+            break
+
+    if not asg_name:
+        return
+
+    try:
+        cw_client = boto3_client('cloudwatch')
+        response = cw_client.describe_alarms(
+            # TODO embedded dependency between create_alarm naming and this
+            AlarmNamePrefix='AutoAlarm-{}'.format(instance_id),
+            AlarmTypes=['MetricAlarm']
+        )
+        logger.info('Response from describe_alarms(): {}'.format(response))
+
+        alarm_list = []
+        if 'MetricAlarms' in response:
+            for alarm in response['MetricAlarms']:
+                alarm_list.append(alarm)
+
+        logger.info('updating {} for {}'.format(alarm_list, instance_id))
+
+        # update the alarm autoscalegroup tag
+        for alarm in alarm_list:
+            alarm.update({'Dimensions': [{'Name': 'AutoScalingGroupName', 'Value': asg_name}]})
+            response = cw_client.put_metric_alarm(**alarm)
+            logger.info('Response from put_metric_alarm {}: {}'.format(alarm, response))
+            
+    except Exception as e:
+            # If any other exceptions which we didn't expect are raised
+            # then fail and log the exception message.
+            logger.error(
+                'Error updating alarm: {}'.format(e))
+
 def process_alarm_tags(instance_id, instance_info, default_alarms, metric_dimensions_map, sns_topic_arn, cw_namespace,
                        create_default_alarms_flag, alarm_separator):
     tags = instance_info['Tags']

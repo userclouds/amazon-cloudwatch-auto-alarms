@@ -1,5 +1,5 @@
 import logging
-from actions import check_alarm_tag, process_alarm_tags, delete_alarms, process_lambda_alarms, scan_and_process_alarm_tags
+from actions import check_alarm_tag, process_alarm_tags, delete_alarms, process_lambda_alarms, scan_and_process_alarm_tags, update_alarms_for_instance
 from os import getenv
 
 logger = logging.getLogger()
@@ -130,7 +130,7 @@ metric_dimensions_map = {
 def lambda_handler(event, context):
     logger.info('event received: {}'.format(event))
     try:
-        if 'source' in event and event['source'] == 'aws.ec2' and event['detail']['state'] == 'running':
+        if 'source' in event and event['source'] == 'aws.ec2' and 'state' in event['detail'] and event['detail']['state'] == 'running':
             instance_id = event['detail']['instance-id']
             # determine if instance is tagged to create an alarm
             instance_info = check_alarm_tag(instance_id, create_alarm_tag)
@@ -139,9 +139,13 @@ def lambda_handler(event, context):
             if instance_info:
                 process_alarm_tags(instance_id, instance_info, default_alarms, metric_dimensions_map, sns_topic_arn,
                                    cw_namespace, create_default_alarms_flag, alarm_separator)
-        elif 'source' in event and event['source'] == 'aws.ec2' and event['detail']['state'] == 'terminated':
+        elif 'source' in event and event['source'] == 'aws.ec2' and 'state' in event['detail'] and event['detail']['state'] == 'terminated':
             instance_id = event['detail']['instance-id']
             result = delete_alarms(instance_id)
+        elif 'source' in event and event['source'] == 'aws.ec2' and 'eventName' in event['detail'] and event['detail']['eventName'] == 'CreateTags':
+            instance_id = event['detail'].get('requestParameters', {}).get('resourcesSet', [{}])[0].get('resourceId', None)
+            if instance_id:
+                update_alarms_for_instance(instance_id, event['detail']['requestParameters']['tagSet']['items'])
         elif 'source' in event and event['source'] == 'aws.lambda' and event['detail'][
             'eventName'] == 'TagResource20170331v2':
             logger.debug(

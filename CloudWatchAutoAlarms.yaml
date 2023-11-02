@@ -145,6 +145,25 @@ Resources:
         - Arn: !GetAtt LambdaFunction.Arn
           Id: LATEST
 
+ CloudWatchAutoAlarmCloudwatchEventEC2Tags:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: Update-CloudWatchAutoAlarmsEC2
+      Description: Updates CloudWatch alarms on instance tag changes via Lambda CloudWatchAutoAlarms.
+      EventPattern: '
+        {
+          "source": ["aws.ec2"],
+          "detail-type": ["AWS API Call via CloudTrail"],
+          "detail": {
+            "eventSource": ["ec2.amazonaws.com"],
+            "eventName": ["CreateTags"]
+          }
+        }'
+      State: !Ref EventState
+      Targets:
+        - Arn: !GetAtt LambdaFunction.Arn
+          Id: LATEST
+
   CloudWatchAutoAlarmCloudwatchEventLambda:
     Type: AWS::Events::Rule
     Properties:
