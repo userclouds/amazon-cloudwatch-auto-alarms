@@ -21,7 +21,7 @@ Parameters:
   AlarmNotificationARN:
     Description: Enter the Amazon SNS Notification ARN for alarm notifications, leave blank to disable notifications.
     Type: String
-    Default: ""
+    Default: "arn:aws:sns:us-west-2:323439664763:infra-alerts:b863f98f-1097-47d6-985f-dd1ac2ca1835"
 
 Conditions:
   ConfigureAlarmNotifications: !Not [!Equals ["", !Ref AlarmNotificationARN]]
