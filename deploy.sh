@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 
-echo "you need to have valid AWS creds in your session, source tools/aws-mfa.sh in main repo if not already"
+echo "you need to have valid AWS creds in your session, run "
+echo ""
+echo "aws sso login"
+echo ""
+echo "and then run"
+echo ""
+echo 'eval "$(aws configure export-credentials --profile example-profile --format env)"'
+echo ""
+echo "and don't forget to clean them up when you're done :)"
 
 zip -j amazon-cloudwatch-auto-alarms.zip src/*
 
